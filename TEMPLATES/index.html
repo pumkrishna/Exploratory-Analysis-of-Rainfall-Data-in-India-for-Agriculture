@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – India Rainfall Analysis{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="padding-top:1.5rem;">
+        <h1>🌧 India Rainfall Analysis for Agriculture</h1>
+        <p>Exploratory data analysis of historical rainfall patterns across 18 Indian states (1990–2023)</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Records</div>
+            <div class="stat-value">{{ stats.total_records }}</div>
+            <div class="stat-sub">State-year combinations</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">Years Covered</div>
+            <div class="stat-value">34</div>
+            <div class="stat-sub">{{ stats.years }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">States / Regions</div>
+            <div class="stat-value">{{ stats.states }}/{{ stats.regions }}</div>
+            <div class="stat-sub">Across all 6 zones</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">Avg Annual Rainfall</div>
+            <div class="stat-value">{{ stats.avg_rainfall }}<span style="font-size:1rem;font-weight:500">mm</span></div>
+            <div class="stat-sub">National average</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-label">Drought Events</div>
+            <div class="stat-value">{{ stats.drought_events }}</div>
+            <div class="stat-sub">Below 75% of normal</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-label">Flood Events</div>
+            <div class="stat-value">{{ stats.flood_events }}</div>
+            <div class="stat-sub">Above 135% of normal</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg Yield Index</div>
+            <div class="stat-value">{{ stats.avg_yield_index }}</div>
+            <div class="stat-sub">Crop yield correlation</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-label">Max Recorded</div>
+            <div class="stat-value" style="font-size:1.3rem;">{{ stats.max_rainfall }}mm</div>
+            <div class="stat-sub">Northeast zone</div>
+        </div>
+    </div>
+
+    <!-- Key Charts -->
+    <div class="card">
+        <div class="chart-title">Annual Rainfall Trend (All India)</div>
+        <img src="{{ charts.annual_trend }}" class="chart-img" alt="Annual Trend">
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
+            <div class="chart-title">Regional Comparison</div>
+            <img src="{{ charts.regional }}" class="chart-img" alt="Regional">
+        </div>
+        <div class="card">
+            <div class="chart-title">Drought & Flood Events</div>
+            <img src="{{ charts.drought_flood }}" class="chart-img" alt="Events">
+        </div>
+    </div>
+
+    <!-- Scenarios -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+        <div class="card" style="border-top:4px solid #27ae60;">
+            <h3 style="color:#27ae60;font-size:0.85rem;">🌾 Scenario 1</h3>
+            <h2 style="font-size:1.1rem;margin:0.5rem 0;">Crop Planning</h2>
+            <p style="font-size:0.88rem;color:#7f8c8d;line-height:1.6;">Farmers use historical rainfall patterns to decide on crop selection, planting schedules, and irrigation methods specific to their region.</p>
+        </div>
+        <div class="card" style="border-top:4px solid #2471a3;">
+            <h3 style="color:#2471a3;font-size:0.85rem;">💧 Scenario 2</h3>
+            <h2 style="font-size:1.1rem;margin:0.5rem 0;">Irrigation Management</h2>
+            <p style="font-size:0.88rem;color:#7f8c8d;line-height:1.6;">Agricultural experts optimize water usage and irrigation scheduling using rainfall variability analysis to prevent waterlogging or drought damage.</p>
+        </div>
+        <div class="card" style="border-top:4px solid #e67e22;">
+            <h3 style="color:#e67e22;font-size:0.85rem;">⚠️ Scenario 3</h3>
+            <h2 style="font-size:1.1rem;margin:0.5rem 0;">Risk Assessment</h2>
+            <p style="font-size:0.88rem;color:#7f8c8d;line-height:1.6;">Policymakers and insurers use drought/flood predictions to design crop insurance schemes and disaster management plans.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">Rainfall vs Crop Yield Correlation</div>
+        <img src="{{ charts.crop_corr }}" class="chart-img" alt="Crop Correlation">
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}EDA Charts – India Rainfall{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="padding-top:1.5rem;">
+        <h1>📊 Exploratory Data Analysis</h1>
+        <p>Comprehensive visual analysis of India's rainfall data across regions, states, and time periods</p>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">Annual Rainfall Trend with Variability Band</div>
+        <img src="{{ charts.annual_trend }}" class="chart-img" alt="Annual Trend">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 The shaded band shows ±1 standard deviation. A slight upward trend in variability is observable over recent decades, possibly linked to climate shifts.</p>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">Monthly Rainfall Patterns by Region</div>
+        <img src="{{ charts.monthly }}" class="chart-img" alt="Monthly">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 All regions show a strong monsoon peak (June–September). Northeast India receives the highest rainfall, while North India shows the lowest. The monsoon window is the critical period for Kharif crop planning.</p>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">Monthly Rainfall Heatmap by Region</div>
+        <img src="{{ charts.heatmap }}" class="chart-img" alt="Heatmap">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 Darker cells indicate higher rainfall months. This heatmap quickly identifies the best and worst months for irrigation planning across each region.</p>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
+            <div class="chart-title">Regional Rainfall Comparison</div>
+            <img src="{{ charts.regional }}" class="chart-img" alt="Regional">
+        </div>
+        <div class="card">
+            <div class="chart-title">Drought & Flood Events by Year</div>
+            <img src="{{ charts.drought_flood }}" class="chart-img" alt="Events">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">Rainfall vs Crop Yield Correlation</div>
+        <img src="{{ charts.crop_corr }}" class="chart-img" alt="Crop Correlation">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 There is an optimal rainfall range for maximum crop yield. Both deficit and excess rainfall negatively impact yields — consistent with agronomic research on crop water requirements.</p>
+    </div>
+
+    <div class="card">
+        <div class="chart-title">State-wise Annual Rainfall Heatmap</div>
+        <img src="{{ charts.state_heatmap }}" class="chart-img" alt="State Heatmap">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 This view allows tracking of how individual states have changed over the decades. States like Meghalaya and Assam consistently show high rainfall, while Rajasthan remains persistently arid.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block title %}ML Models – India Rainfall{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="padding-top:1.5rem;">
+        <h1>🤖 Machine Learning Models</h1>
+        <p>Rainfall prediction and drought classification using Scikit-learn algorithms</p>
+    </div>
+
+    <!-- Best Model Banner -->
+    <div class="card" style="background:linear-gradient(135deg,#1a6b3c,#27ae60);color:white;padding:1.8rem;">
+        <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
+            <div>
+                <div style="font-size:0.85rem;opacity:0.8;text-transform:uppercase;letter-spacing:0.05em;">Best Model</div>
+                <div style="font-size:1.8rem;font-weight:800;margin-top:0.2rem;">{{ ml.best_model }}</div>
+                <div style="opacity:0.8;margin-top:0.3rem;font-size:0.9rem;">Selected based on highest R² score on test data</div>
+            </div>
+            <div style="display:flex;gap:2rem;flex-wrap:wrap;">
+                {% for name, metrics in ml.regression_results.items() %}
+                {% if name == ml.best_model %}
+                <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.8rem 1.2rem;">
+                    <div style="font-size:0.8rem;opacity:0.8;">R² Score</div>
+                    <div style="font-size:1.5rem;font-weight:700;">{{ metrics.R2 }}</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.8rem 1.2rem;">
+                    <div style="font-size:0.8rem;opacity:0.8;">RMSE</div>
+                    <div style="font-size:1.5rem;font-weight:700;">{{ metrics.RMSE }}mm</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.8rem 1.2rem;">
+                    <div style="font-size:0.8rem;opacity:0.8;">MAE</div>
+                    <div style="font-size:1.5rem;font-weight:700;">{{ metrics.MAE }}mm</div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Comparison Table -->
+    <div class="card">
+        <div class="chart-title">Regression Model Comparison</div>
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>R² Score</th>
+                <th>RMSE (mm)</th>
+                <th>MAE (mm)</th>
+                <th>Status</th>
+            </tr>
+            {% for name, metrics in ml.regression_results.items() %}
+            <tr>
+                <td><strong>{{ name }}</strong></td>
+                <td>{{ metrics.R2 }}</td>
+                <td>{{ metrics.RMSE }}</td>
+                <td>{{ metrics.MAE }}</td>
+                <td>
+                    {% if name == ml.best_model %}
+                    <span class="badge badge-green">✓ Best</span>
+                    {% else %}
+                    <span class="badge badge-blue">Trained</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
+            <div class="chart-title">Model Performance Comparison</div>
+            <img src="{{ ml.charts.comparison }}" class="chart-img" alt="Comparison">
+        </div>
+        <div class="card">
+            <div class="chart-title">Actual vs Predicted Rainfall</div>
+            <img src="{{ ml.charts.predictions }}" class="chart-img" alt="Predictions">
+        </div>
+    </div>
+
+    {% if ml.charts.importance %}
+    <div class="card">
+        <div class="chart-title">Feature Importance</div>
+        <img src="{{ ml.charts.importance }}" class="chart-img" alt="Feature Importance">
+        <p style="color:#7f8c8d;font-size:0.85rem;margin-top:0.8rem;">📌 Higher importance = greater influence on rainfall prediction. The early months (Jan–Jun) and geographic features play key roles.</p>
+    </div>
+    {% endif %}
+
+    <!-- Drought Classifier -->
+    <div class="card" style="border-left:4px solid #e67e22;">
+        <div class="chart-title">🌵 Drought Classification (Decision Tree)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;">
+            <div style="background:#fef9f0;border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:0.8rem;color:#7f8c8d;text-transform:uppercase;">Accuracy</div>
+                <div style="font-size:2rem;font-weight:800;color:#e67e22;">{{ (ml.drought_accuracy * 100)|round(1) }}%</div>
+            </div>
+            {% if ml.drought_report %}
+            {% for cls, metrics in ml.drought_report.items() %}
+            {% if cls in ['Normal', 'Drought'] %}
+            <div style="background:#f8f9fa;border-radius:10px;padding:1rem;text-align:center;">
+                <div style="font-size:0.8rem;color:#7f8c8d;text-transform:uppercase;">{{ cls }}</div>
+                <div style="font-size:1.1rem;font-weight:700;color:#2c3e50;">Precision: {{ (metrics.precision * 100)|round(1) }}%</div>
+                <div style="font-size:0.9rem;color:#7f8c8d;">Recall: {{ (metrics.recall * 100)|round(1) }}%</div>
+                <div style="font-size:0.9rem;color:#7f8c8d;">F1: {{ (metrics['f1-score'] * 100)|round(1) }}%</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+        <p style="color:#7f8c8d;font-size:0.85rem;">The Decision Tree Classifier uses Year, Region, State, and early monthly readings to classify whether a year will be a drought year. This powers Scenario 3: Agricultural Risk Assessment.</p>
+    </div>
+
+    <!-- Predict API -->
+    <div class="card" style="border-left:4px solid #2471a3;">
+        <div class="chart-title">🔮 Live Rainfall Predictor</div>
+        <p style="color:#7f8c8d;font-size:0.88rem;margin-bottom:1rem;">Enter first-half rainfall data to predict annual total using the best-trained model.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;">
+            <div>
+                <label style="font-size:0.82rem;font-weight:600;color:#555;">Year</label>
+                <input id="p_year" type="number" value="2024" min="1990" max="2030" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;margin-top:0.3rem;">
+            </div>
+            <div>
+                <label style="font-size:0.82rem;font-weight:600;color:#555;">Region</label>
+                <select id="p_region" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;margin-top:0.3rem;">
+                    <option>North India</option><option>South India</option><option>East India</option>
+                    <option>West India</option><option>Central India</option><option>Northeast India</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:0.82rem;font-weight:600;color:#555;">State</label>
+                <select id="p_state" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;margin-top:0.3rem;">
+                    <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+                    <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
+                    <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+                    <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+                    <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+                    <option>Meghalaya</option><option>Odisha</option><option>Punjab</option>
+                    <option>Rajasthan</option><option>Tamil Nadu</option><option>Uttar Pradesh</option>
+                    <option>West Bengal</option>
+                </select>
+            </div>
+            {% for m in ['Jan','Feb','Mar','Apr','May','Jun'] %}
+            <div>
+                <label style="font-size:0.82rem;font-weight:600;color:#555;">{{ m }} (mm)</label>
+                <input id="p_{{ m }}" type="number" value="{{ range(5, 80)|random }}" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:6px;margin-top:0.3rem;">
+            </div>
+            {% endfor %}
+        </div>
+        <button onclick="predict()" id="predict-btn" style="margin-top:1rem;background:var(--green);color:white;border:none;padding:0.7rem 1.8rem;border-radius:8px;cursor:pointer;font-size:0.95rem;font-weight:600;">
+            Predict Annual Rainfall
+        </button>
+        <div id="predict-result" style="margin-top:1rem;padding:1rem 1.2rem;background:#f0faf5;border-radius:8px;display:none;border-left:3px solid #27ae60;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.8rem;">
+                <div>
+                    <div style="font-size:0.78rem;color:#7f8c8d;text-transform:uppercase;">Predicted Rainfall</div>
+                    <div id="predict-val" style="font-size:1.6rem;color:#1a6b3c;font-weight:800;"></div>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#7f8c8d;text-transform:uppercase;">Regional Average</div>
+                    <div id="predict-avg" style="font-size:1.3rem;color:#2471a3;font-weight:700;"></div>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#7f8c8d;text-transform:uppercase;">Risk Assessment</div>
+                    <div id="predict-risk" style="font-size:1rem;font-weight:700;margin-top:0.2rem;"></div>
+                </div>
+                <div>
+                    <div style="font-size:0.78rem;color:#7f8c8d;text-transform:uppercase;">Model Used</div>
+                    <div id="predict-model" style="font-size:0.9rem;color:#555;font-weight:600;margin-top:0.2rem;"></div>
+                </div>
+            </div>
+        </div>
+        <div id="predict-error" style="margin-top:1rem;padding:1rem;background:#fdf0f0;border-radius:8px;display:none;border-left:3px solid #c0392b;color:#c0392b;font-size:0.88rem;"></div>
+    </div>
+</div>
+
+<script>
+async function predict() {
+    const btn = document.getElementById('predict-btn');
+    const resultDiv = document.getElementById('predict-result');
+    const errorDiv = document.getElementById('predict-error');
+    
+    resultDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    btn.textContent = 'Predicting...';
+    btn.disabled = true;
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+    const payload = {
+        year:   parseInt(document.getElementById('p_year').value),
+        region: document.getElementById('p_region').value,
+        state:  document.getElementById('p_state').value,
+    };
+    months.forEach(m => {
+        payload[m] = parseFloat(document.getElementById('p_' + m).value) || 0;
+    });
+
+    try {
+        const res = await fetch('/api/predict', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            document.getElementById('predict-val').textContent   = data.predicted_rainfall + ' mm';
+            document.getElementById('predict-avg').textContent   = data.regional_average + ' mm';
+            document.getElementById('predict-risk').textContent  = data.risk_assessment;
+            document.getElementById('predict-model').textContent = data.model_used;
+            resultDiv.style.display = 'block';
+        } else {
+            errorDiv.textContent = '⚠️ Error: ' + data.error;
+            errorDiv.style.display = 'block';
+        }
+    } catch(e) {
+        errorDiv.textContent = '⚠️ Network error: ' + e.message;
+        errorDiv.style.display = 'block';
+    } finally {
+        btn.textContent = 'Predict Annual Rainfall';
+        btn.disabled = false;
+    }
+}
+</script>
+{% endblock %}

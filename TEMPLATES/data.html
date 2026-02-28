@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Data Explorer – India Rainfall{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="page-header" style="padding-top:1.5rem;">
+        <h1>🗃 Data Explorer</h1>
+        <p>Browse the dataset — showing first 50 records of {{ total }} total</p>
+    </div>
+
+    <!-- Statistical Summary -->
+    <div class="card">
+        <div class="chart-title">Statistical Summary (Key Columns)</div>
+        <table>
+            <tr>
+                <th>Statistic</th>
+                {% for col in ['Annual_Rainfall', 'Crop_Yield_Index', 'Jun', 'Jul', 'Aug', 'Sep'] %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for stat in ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'] %}
+            <tr>
+                <td><strong>{{ stat }}</strong></td>
+                {% for col in ['Annual_Rainfall', 'Crop_Yield_Index', 'Jun', 'Jul', 'Aug', 'Sep'] %}
+                <td>
+                    {% if stats[col] and stats[col][stat] is defined %}
+                        {{ stats[col][stat] }}
+                    {% else %}—{% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card">
+        <div class="chart-title">Dataset Preview (First 50 Records)</div>
+        <div style="overflow-x:auto;">
+            <table>
+                <tr>
+                    {% for col in columns %}<th>{{ col }}</th>{% endfor %}
+                </tr>
+                {% for row in rows %}
+                <tr>
+                    {% for val in row %}
+                    <td>
+                        {% if val == 1 and loop.index > 14 %}
+                            <span class="badge badge-orange">Yes</span>
+                        {% elif val == 0 and loop.index > 14 %}
+                            <span class="badge" style="background:#eee;color:#555;">No</span>
+                        {% else %}
+                            {{ val }}
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Data Dictionary -->
+    <div class="card">
+        <div class="chart-title">Data Dictionary</div>
+        <table>
+            <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+            <tr><td>Year</td><td><span class="badge badge-blue">int</span></td><td>Calendar year (1990–2023)</td></tr>
+            <tr><td>Region</td><td><span class="badge badge-green">str</span></td><td>Broad geographic zone (North/South/East/West/Central/Northeast India)</td></tr>
+            <tr><td>State</td><td><span class="badge badge-green">str</span></td><td>Indian state name</td></tr>
+            <tr><td>Annual_Rainfall</td><td><span class="badge badge-blue">float</span></td><td>Total annual rainfall in millimeters</td></tr>
+            <tr><td>Jan–Dec</td><td><span class="badge badge-blue">float</span></td><td>Monthly rainfall in mm for each respective month</td></tr>
+            <tr><td>Crop_Yield_Index</td><td><span class="badge badge-blue">float</span></td><td>Normalized crop yield index (0–1+); derived from rainfall deviation from optimal</td></tr>
+            <tr><td>Drought_Year</td><td><span class="badge badge-orange">bool</span></td><td>1 if annual rainfall &lt; 75% of regional base, else 0</td></tr>
+            <tr><td>Flood_Year</td><td><span class="badge badge-orange">bool</span></td><td>1 if annual rainfall &gt; 135% of regional base, else 0</td></tr>
+        </table>
+    </div>
+</div>
+{% endblock %}
